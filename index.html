@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Professional Multi-Section Quiz</title>
+<title>Professional Multi-Page Quiz</title>
 <style>
 
 body {
@@ -20,6 +20,7 @@ flex:3;
 padding:20px;
 overflow-y:auto;
 background:white;
+margin-right:260px;
 }
 
 .option {
@@ -83,7 +84,7 @@ color:white;
 
 select {
 padding:6px;
-margin-bottom:15px;
+margin:5px 0;
 }
 
 </style>
@@ -92,12 +93,18 @@ margin-bottom:15px;
 
 <div class="container">
 
-<div class="question-area" style="margin-right:260px;">
+<div class="question-area">
 
 <h2>CLASSICAL DANCE MCQ Quiz</h2>
 
-<label><b>Select Section:</b></label>
-<select id="sectionSelect"></select>
+<label><b>Select Page:</b></label><br>
+<select id="pageSelect"></select>
+
+<label><b>Select Mode:</b></label><br>
+<select id="modeSelect">
+<option value="false">Non Shuffle</option>
+<option value="true">Shuffle</option>
+</select>
 
 <div id="progress"></div>
 <div id="question"></div>
@@ -106,7 +113,7 @@ margin-bottom:15px;
 <button onclick="prevQuestion()">Previous</button>
 <button onclick="nextQuestion()">Next</button>
 <button onclick="showResult()">Submit</button>
-<button class="restart-btn" onclick="restartSection()">Restart Section</button>
+<button class="restart-btn" onclick="restartPage()">Restart Page</button>
 
 <div id="explanation"></div>
 <div id="result"></div>
@@ -132,93 +139,84 @@ Not Visited: <span id="notVisitedCount">0</span>
 <script>
 
 // =============================
-// SECTION CONFIGURATION
-// shuffleQuestions: true / false
+// ADD PAGES HERE (Only once per page)
 // =============================
-const allSections = {
 
-"page 1 not change": {
-shuffleQuestions: false,
-questions: [
-{
-question: "Which Rasa represents Peace? / அமைதியை குறிக்கும் ரசம் எது?",
-options: ["Shanta","Shringar","Raudra","Veer"],
-correctAnswer: "Shanta",
-explanation: "Shanta Rasa represents peace and calmness."
-}
-]
-},
+const allPages = {
 
-"page 1 change": {
-shuffleQuestions: true,
-questions: [
-{
-question: "Sattriya classical dance belongs to which state?",
-options: ["Assam","Kerala","Tamil Nadu","Odisha"],
-correctAnswer: "Assam",
-explanation: "Sattriya belongs to Assam."
-}
-]
-},
-
-"page 2 not change": {
-shuffleQuestions: false,
-questions: [
+"Page 1": [
 {
 question: "Which Rasa represents Peace?",
 options: ["Shanta","Shringar","Raudra","Veer"],
 correctAnswer: "Shanta",
 explanation: "Shanta Rasa represents peace."
 }
-]
-},
+],
 
-"page 2 change": {
-shuffleQuestions: true,
-questions: [
+"Page 2": [
 {
 question: "Sattriya classical dance belongs to which state?",
 options: ["Assam","Kerala","Tamil Nadu","Odisha"],
 correctAnswer: "Assam",
 explanation: "Sattriya belongs to Assam."
 }
-]
-},
+],
 
-"page 3 not change": {
-shuffleQuestions: false,
-questions: [
+"Page 3": [
 {
-question: "Which Rasa represents Peace?",
-options: ["Shanta","Shringar","Raudra","Veer"],
-correctAnswer: "Shanta",
-explanation: "Shanta Rasa represents peace."
+question: "Mohiniyattam belongs to which state?",
+options: ["Kerala","Odisha","Assam","Tamil Nadu"],
+correctAnswer: "Kerala",
+explanation: "Mohiniyattam belongs to Kerala."
 }
-]
-},
+],
 
-"page 3 change": {
-shuffleQuestions: true,
-questions: [
+"Page 4": [
 {
-question: "Sattriya classical dance belongs to which state?",
-options: ["Assam","Kerala","Tamil Nadu","Odisha"],
-correctAnswer: "Assam",
-explanation: "Sattriya belongs to Assam."
+question: "Bharatanatyam originated in?",
+options: ["Tamil Nadu","Kerala","UP","Manipur"],
+correctAnswer: "Tamil Nadu",
+explanation: "Bharatanatyam originated in Tamil Nadu."
+}
+],
+
+"Page 5": [
+{
+question: "Kathak belongs to which state?",
+options: ["Uttar Pradesh","Kerala","Assam","Odisha"],
+correctAnswer: "Uttar Pradesh",
+explanation: "Kathak belongs to Uttar Pradesh."
+}
+],
+
+"Page 6": [
+{
+question: "Kathak belongs to which state?",
+options: ["Uttar Pradesh","Kerala","Assam","Odisha"],
+correctAnswer: "Uttar Pradesh",
+explanation: "Kathak belongs to Uttar Pradesh."
+},
+{
+question: "raja belongs to which state?",
+options: ["Uttar Pradesh","Kerala","Assam","Odisha"],
+correctAnswer: "Uttar Pradesh",
+explanation: "Kathak belongs to Uttar Pradesh."
 }
 ]
-}
 
 };
 
 // =============================
+
 let quizData = [];
 let current = 0;
 let answers = [];
 let visited = [];
-let currentSection = "";
+let currentPage = "";
+let shuffleMode = false;
 
 // =============================
+
 function shuffleArray(array){
 for(let i = array.length - 1; i > 0; i--){
 let j = Math.floor(Math.random() * (i + 1));
@@ -228,19 +226,17 @@ return array;
 }
 
 // =============================
-function loadSection(sectionName){
 
-currentSection = sectionName;
+function loadPage(pageName){
 
-let section = allSections[sectionName];
+currentPage = pageName;
 
-quizData = JSON.parse(JSON.stringify(section.questions));
+quizData = JSON.parse(JSON.stringify(allPages[pageName]));
 
-if(section.shuffleQuestions){
+if(shuffleMode){
 shuffleArray(quizData);
-}
-
 quizData.forEach(q => shuffleArray(q.options));
+}
 
 current = 0;
 answers = new Array(quizData.length).fill(null);
@@ -252,11 +248,13 @@ loadQuestion();
 }
 
 // =============================
-function restartSection(){
-loadSection(currentSection);
+
+function restartPage(){
+loadPage(currentPage);
 }
 
 // =============================
+
 function loadQuestion(){
 
 visited[current] = true;
@@ -297,6 +295,8 @@ loadNavigation();
 updateSummary();
 }
 
+// =============================
+
 function selectAnswer(index){
 answers[current] = index;
 loadQuestion();
@@ -321,6 +321,8 @@ current = i;
 loadQuestion();
 }
 
+// =============================
+
 function loadNavigation(){
 
 let navHTML = "";
@@ -339,6 +341,8 @@ navHTML += '<button class="'+className+'" onclick="goToQuestion('+i+')">'+(i+1)+
 document.getElementById("navPanel").innerHTML = navHTML;
 }
 
+// =============================
+
 function updateSummary(){
 
 let answered = answers.filter(a=>a!==null).length;
@@ -349,6 +353,8 @@ document.getElementById("answeredCount").innerText = answered;
 document.getElementById("notAnsweredCount").innerText = notAnswered;
 document.getElementById("notVisitedCount").innerText = notVisited;
 }
+
+// =============================
 
 function showResult(){
 
@@ -365,22 +371,28 @@ document.getElementById("result").innerHTML =
 }
 
 // =============================
+
 window.onload = function(){
 
-let select = document.getElementById("sectionSelect");
+let pageSelect = document.getElementById("pageSelect");
 
-for(let section in allSections){
+for(let page in allPages){
 let option = document.createElement("option");
-option.value = section;
-option.text = section;
-select.appendChild(option);
+option.value = page;
+option.text = page;
+pageSelect.appendChild(option);
 }
 
-select.onchange = function(){
-loadSection(this.value);
+pageSelect.onchange = function(){
+loadPage(this.value);
 };
 
-loadSection(Object.keys(allSections)[0]);
+document.getElementById("modeSelect").onchange = function(){
+shuffleMode = (this.value === "true");
+loadPage(pageSelect.value);
+};
+
+loadPage(Object.keys(allPages)[0]);
 };
 
 </script>
