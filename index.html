@@ -2,20 +2,21 @@
 <html>
 <head>
 <title>Professional Multi-Page Quiz</title>
+
 <style>
 
-body {
-font-family: Arial;
+body{
+font-family:Arial;
 margin:0;
 background:#f2f2f2;
 }
 
-.container {
+.container{
 display:flex;
 height:100vh;
 }
 
-.question-area {
+.question-area{
 flex:3;
 padding:20px;
 overflow-y:auto;
@@ -23,7 +24,7 @@ background:white;
 margin-right:260px;
 }
 
-.option {
+.option{
 margin:8px 0;
 padding:10px;
 border:1px solid #ccc;
@@ -31,22 +32,22 @@ border-radius:5px;
 cursor:pointer;
 }
 
-.option.correct { background:#c8f7c5; }
-.option.wrong { background:#f7c5c5; }
+.option.correct{background:#c8f7c5;}
+.option.wrong{background:#f7c5c5;}
 
-button {
+button{
 margin:5px;
 padding:8px 15px;
 cursor:pointer;
 }
 
-.restart-btn {
+.restart-btn{
 background:#ff9800;
 color:white;
 border:none;
 }
 
-.nav-area {
+.nav-area{
 flex:1;
 background:#222;
 color:white;
@@ -59,17 +60,17 @@ overflow-y:auto;
 width:260px;
 }
 
-.summary {
+.summary{
 margin-bottom:15px;
 }
 
-.nav-grid {
+.nav-grid{
 display:flex;
 flex-wrap:wrap;
 gap:5px;
 }
 
-.nav-btn {
+.nav-btn{
 width:35px;
 height:35px;
 border:none;
@@ -78,17 +79,19 @@ background:#555;
 color:white;
 }
 
-.nav-btn.current { background:#1e90ff; }
-.nav-btn.answered { background:#28a745; }
-.nav-btn.notanswered { background:#dc3545; }
+.nav-btn.current{background:#1e90ff;}
+.nav-btn.correct{background:#28a745;}
+.nav-btn.wrong{background:#dc3545;}
+.nav-btn.notanswered{background:#ff9800;}
 
-select {
+select{
 padding:6px;
 margin:5px 0;
 }
 
 </style>
 </head>
+
 <body>
 
 <div class="container">
@@ -139,429 +142,339 @@ Not Visited: <span id="notVisitedCount">0</span>
 <script>
 
 // =============================
-// ADD PAGES HERE (Only once per page)
+// ALL QUIZ PAGES
 // =============================
 
 const allPages = {
 
-"Page 1": [
+"Page 1":[
+
 {
-question: "Who is known as the Father of the Indian Renaissance? / இந்திய மறுமலர்ச்சியின் தந்தை என அழைக்கப்படுபவர் யார்?",
-options: ["Swami Vivekananda / சுவாமி விவேகானந்தர்","Raja Ram Mohan Roy / ராஜா ராம் மோகன் ராய்","Dayananda Saraswati / தயானந்த சரஸ்வதி","Ishwar Chandra Vidyasagar / ஈஷ்வர் சந்திர வித்யாசாகர்"],
-correctAnswer: "Raja Ram Mohan Roy / ராஜா ராம் மோகன் ராய்",
-explanation: "Raja Ram Mohan Roy is called the Father of the Indian Renaissance due to his reform movements. / சமூக, மத மற்றும் கல்வி சீர்திருத்தங்களால் அவர் இந்திய மறுமலர்ச்சியின் தந்தை என அழைக்கப்படுகிறார்."
+question:"Who is known as the Father of the Indian Renaissance?",
+options:["Swami Vivekananda","Raja Ram Mohan Roy","Dayananda Saraswati","Ishwar Chandra Vidyasagar"],
+correctAnswer:"Raja Ram Mohan Roy",
+explanation:"Raja Ram Mohan Roy is called the Father of the Indian Renaissance."
 },
 
 {
-question: "In which year was Raja Ram Mohan Roy born? / ராஜா ராம் மோகன் ராய் எந்த ஆண்டு பிறந்தார்?",
-options: ["1765 / 1765","1772 / 1772","1780 / 1780","1795 / 1795"],
-correctAnswer: "1772 / 1772",
-explanation: "He was born in 1772. / அவர் 1772 ஆம் ஆண்டு பிறந்தார்."
+question:"In which year was Raja Ram Mohan Roy born?",
+options:["1765","1772","1780","1795"],
+correctAnswer:"1772",
+explanation:"He was born in 1772."
 },
 
 {
-question: "Raja Ram Mohan Roy was born in which village? / ராஜா ராம் மோகன் ராய் எந்த கிராமத்தில் பிறந்தார்?",
-options: ["Nadia / நாடியா","Radhanagar / ராதாநகர்","Murshidabad / முர்ஷிதாபாத்","Patna / பாட்னா"],
-correctAnswer: "Radhanagar / ராதாநகர்",
-explanation: "His birthplace was Radhanagar village. / அவரது பிறப்பிடம் ராதாநகர் கிராமம்."
+question:"Raja Ram Mohan Roy was born in which village?",
+options:["Nadia","Radhanagar","Murshidabad","Patna"],
+correctAnswer:"Radhanagar",
+explanation:"His birthplace was Radhanagar village."
 },
 
 {
-question: "Radhanagar is located in which region? / ராதாநகர் எந்த பகுதியில் அமைந்துள்ளது?",
-options: ["Punjab / பஞ்சாப்","Bengal / பெங்கால்","Maharashtra / மகாராஷ்டிரா","Bihar / பீகார்"],
-correctAnswer: "Bengal / பெங்கால்",
-explanation: "He was born in Bengal. / அவர் பெங்காலில் பிறந்தார்."
+question:"Radhanagar is located in which region?",
+options:["Punjab","Bengal","Maharashtra","Bihar"],
+correctAnswer:"Bengal",
+explanation:"He was born in Bengal."
 },
 
 {
-question: "Raja Ram Mohan Roy studied Sanskrit literature and Hindu philosophy in which city? / ராஜா ராம் மோகன் ராய் சமஸ்கிருதமும் இந்துத் தத்துவமும் எந்த நகரத்தில் பயின்றார்?",
-options: ["Kolkata / கொல்கத்தா","Patna / பாட்னா","Varanasi / வராணசி","Delhi / டெல்லி"],
-correctAnswer: "Varanasi / வராணசி",
-explanation: "He studied Sanskrit and Hindu philosophy in Varanasi. / அவர் வராணசியில் சமஸ்கிருதமும் இந்துத் தத்துவமும் பயின்றார்."
+question:"Raja Ram Mohan Roy studied Sanskrit literature in which city?",
+options:["Kolkata","Patna","Varanasi","Delhi"],
+correctAnswer:"Varanasi",
+explanation:"He studied Sanskrit and Hindu philosophy in Varanasi."
 },
 
 {
-question: "He studied Persian and Arabic in which city? / அவர் பாரசீகமும் அரபியும் எந்த நகரத்தில் பயின்றார்?",
-options: ["Varanasi / வராணசி","Patna / பாட்னா","Calcutta / கல்கத்தா","Agra / ஆக்ரா"],
-correctAnswer: "Patna / பாட்னா",
-explanation: "He studied Persian, Arabic, and the Quran in Patna. / அவர் பாட்னாவில் பாரசீகமும் அரபியும் குர்ஆனையும் பயின்றார்."
+question:"He studied Persian and Arabic in which city?",
+options:["Varanasi","Patna","Calcutta","Agra"],
+correctAnswer:"Patna",
+explanation:"He studied Persian and Arabic in Patna."
 },
 
 {
-question: "Raja Ram Mohan Roy mastered which of the following languages? / கீழ்க்கண்ட எந்த மொழிகளில் அவர் தேர்ச்சி பெற்றார்?",
-options: ["English / ஆங்கிலம்","Latin / லத்தீன்","Greek / கிரேக்கம்","All of the above / மேலே உள்ள அனைத்தும்"],
-correctAnswer: "All of the above / மேலே உள்ள அனைத்தும்",
-explanation: "He mastered English, Latin, Greek, Hebrew, along with Indian languages. / அவர் ஆங்கிலம், லத்தீன், கிரேக்கம், ஹீப்ரூ உள்ளிட்ட பல மொழிகளில் தேர்ச்சி பெற்றார்."
+question:"Raja Ram Mohan Roy opposed which inhuman practice?",
+options:["Child marriage","Sati","Untouchability","Polygamy"],
+correctAnswer:"Sati",
+explanation:"He led a powerful movement against sati."
 },
 
 {
-question: "Raja Ram Mohan Roy opposed which inhuman practice? / ராஜா ராம் மோகன் ராய் எந்த கொடூரமான பழக்கத்திற்கு எதிராக போராடினார்?",
-options: ["Child marriage / குழந்தை திருமணம்","Sati / சதி","Untouchability / தீண்டாமை","Polygamy / பலதாரத் திருமணம்"],
-correctAnswer: "Sati / சதி",
-explanation: "He led a powerful movement against sati. / சதி முறைக்கு எதிராக அவர் வலுவான இயக்கத்தை நடத்தியார்."
+question:"Which Governor-General helped abolish Sati in 1829?",
+options:["Lord Dalhousie","Lord Canning","William Bentinck","Lord Curzon"],
+correctAnswer:"William Bentinck",
+explanation:"William Bentinck passed the regulation banning sati."
 },
 
 {
-question: "Which Governor-General helped abolish Sati in 1829? / 1829 ஆம் ஆண்டு சதி முறையை ரத்து செய்த கவர்னர் ஜெனரல் யார்?",
-options: ["Lord Dalhousie / லார்ட் டல்ஹௌசி","Lord Canning / லார்ட் கேனிங்","William Bentinck / வில்லியம் பென்டிங்க்","Lord Curzon / லார்ட் கர்சன்"],
-correctAnswer: "William Bentinck / வில்லியம் பென்டிங்க்",
-explanation: "William Bentinck passed the regulation banning sati in 1829. / வில்லியம் பென்டிங்க் 1829 இல் சதி முறையை தடைசெய்யும் சட்டத்தை கொண்டு வந்தார்."
+question:"In which year was Sati officially abolished?",
+options:["1815","1828","1829","1835"],
+correctAnswer:"1829",
+explanation:"The law abolishing sati was enacted in 1829."
 },
 
 {
-question: "In which year was Sati officially abolished? / சதி முறையை எந்த ஆண்டு அதிகாரப்பூர்வமாக ரத்து செய்தனர்?",
-options: ["1815 / 1815","1828 / 1828","1829 / 1829","1835 / 1835"],
-correctAnswer: "1829 / 1829",
-explanation: "The law abolishing sati was enacted in 1829. / 1829 ஆம் ஆண்டு சதி ஒழிப்பு சட்டம் இயற்றப்பட்டது."
-},
+question:"Raja Ram Mohan Roy supported which type of education?",
+options:["Traditional only","Western modern education","Military education","Religious-only education"],
+correctAnswer:"Western modern education",
+explanation:"He supported modern western education."
+}
 
-{
-question: "Raja Ram Mohan Roy supported which type of education? / அவர் எந்த வகை கல்வியை ஆதரித்தார்?",
-options: ["Traditional only / பாரம்பரிய கல்வி மட்டும்","Western modern education / மேற்கு நவீன கல்வி","Military education / இராணுவ கல்வி","Religious-only education / மத கல்வி மட்டும்"],
-correctAnswer: "Western modern education / மேற்கு நவீன கல்வி",
-explanation: "He was among the earliest supporters of modern Western education in India. / இந்தியாவில் மேற்கு நவீன கல்வியை முதன்முதலில் ஆதரித்தவர்களில் ஒருவர்."
-},
+],
 
+"Page 2":[
 {
-question: "Hindu College was founded in which city? / இந்து கல்லூரி எந்த நகரத்தில் நிறுவப்பட்டது?",
-options: ["Madras / மதராஸ்","Bombay / மும்பை","Calcutta / கல்கத்தா","Delhi / டெல்லி"],
-correctAnswer: "Calcutta / கல்கத்தா",
-explanation: "Hindu College was founded in Calcutta. / இந்து கல்லூரி கல்கத்தாவில் நிறுவப்பட்டது."
-},
-
-{
-question: "Hindu College is now known as? / இந்து கல்லூரி தற்போது எப்படிப் அழைக்கப்படுகிறது?",
-options: ["Calcutta University / கல்கத்தா பல்கலைக்கழகம்","Presidency University / பிரெசிடென்சி பல்கலைக்கழகம்","Jadavpur University / ஜாதவ்பூர் பல்கலைக்கழகம்","Delhi University / டெல்லி பல்கலைக்கழகம்"],
-correctAnswer: "Presidency University / பிரெசிடென்சி பல்கலைக்கழகம்",
-explanation: "Hindu College later became Presidency University. / பின்னர் இது பிரெசிடென்சி பல்கலைக்கழகமாக மாற்றப்பட்டது."
-},
-
-{
-question: "Which college was established by Raja Ram Mohan Roy to promote Vedanta philosophy? / வேதாந்த தத்துவத்தைப் பரப்ப ராஜா ராம் மோகன் ராய் எந்த கல்லூரியை நிறுவினார்?",
-options: ["Hindu College / இந்து கல்லூரி","Vedanta College / வேதாந்த கல்லூரி","Sanskrit College / சமஸ்கிருத கல்லூரி","National College / தேசிய கல்லூரி"],
-correctAnswer: "Vedanta College / வேதாந்த கல்லூரி",
-explanation: "He established Vedanta College. / அவர் வேதாந்த கல்லூரியை நிறுவினார்."
-},
-
-{
-question: "Raja Ram Mohan Roy supported the use of which language to spread scientific ideas? / அறிவியல் கருத்துகளைப் பரப்ப அவர் எந்த மொழியை ஆதரித்தார்?",
-options: ["Only English / ஆங்கிலம் மட்டும்","Vernacular languages / உள்ளூர் மொழிகள்","Persian / பாரசீகம்","Sanskrit only / சமஸ்கிருதம் மட்டும்"],
-correctAnswer: "Vernacular languages / உள்ளூர் மொழிகள்",
-explanation: "He believed modern ideas should reach people through local languages. / நவீன கருத்துகள் மக்களிடம் உள்ளூர் மொழிகளில் சென்று சேர வேண்டும் என நம்பினார்."
-},
-
-{
-question: "Which journal was published by Raja Ram Mohan Roy? / ராஜா ராம் மோகன் ராய் வெளியிட்ட இதழ் எது?",
-options: ["Kesari / கேசரி","Samvad Kaumudi / சம்வாத் கௌமுதி","Harijan / ஹரிஜன்","Young India / யங் இந்தியா"],
-correctAnswer: "Samvad Kaumudi / சம்வாத் கௌமுதி",
-explanation: "Samvad Kaumudi was his journal to spread reformist ideas. / சீர்திருத்தக் கருத்துகளைப் பரப்ப அவர் சம்வாத் கௌமுதி இதழை வெளியிட்டார்."
-},
-
-{
-question: "Raja Ram Mohan Roy believed that the Vedas supported which concept? / வேதங்கள் எந்த கருத்தை ஆதரிக்கின்றன என அவர் நம்பினார்?",
-options: ["Polytheism / பலதெய்வ வழிபாடு","Idol worship / சிலை வழிபாடு","Monotheism / ஒரே கடவுள் நம்பிக்கை","Atheism / இறை மறுப்பு"],
-correctAnswer: "Monotheism / ஒரே கடவுள் நம்பிக்கை",
-explanation: "He argued that Vedas supported belief in one God. / வேதங்கள் ஒரே கடவுள் நம்பிக்கையை ஆதரிக்கின்றன என அவர் கூறினார்."
-},
-
-{
-question: "How many Upanishads were translated by him into Bengali? / அவர் எத்தனை உபநிஷதங்களை பெங்காலி மொழிக்கு மொழிபெயர்த்தார்?",
-options: ["Two / இரண்டு","Three / மூன்று","Five / ஐந்து","Ten / பத்து"],
-correctAnswer: "Five / ஐந்து",
-explanation: "He translated five Upanishads into Bengali. / அவர் ஐந்து உபநிஷதங்களை பெங்காலி மொழிக்கு மொழிபெயர்த்தார்."
-},
-
-{
-question: "\"Gift to Monotheism\" was written in which language? / \"Gift to Monotheism\" எந்த மொழியில் எழுதப்பட்டது?",
-options: ["English / ஆங்கிலம்","Bengali / பெங்காலி","Sanskrit / சமஸ்கிருதம்","Persian / பாரசீகம்"],
-correctAnswer: "Persian / பாரசீகம்",
-explanation: "The book was written in Persian. / இந்த நூல் பாரசீக மொழியில் எழுதப்பட்டது."
-},
-
-{
-question: "Raja Ram Mohan Roy promoted which philosophy? / அவர் எந்த தத்துவத்தைப் பரப்பினார்?",
-options: ["Buddhism / புத்தமதம்","Vedanta / வேதாந்தம்","Jainism / ஜைனமதம்","Sikhism / சிக்மதம்"],
-correctAnswer: "Vedanta / வேதாந்தம்",
-explanation: "He promoted Vedanta philosophy. / அவர் வேதாந்த தத்துவத்தைப் பரப்பினார்."
-},
-
-{
-question: "In which year was Atmiya Sabha founded? / ஆத்மிய சபை எந்த ஆண்டு நிறுவப்பட்டது?",
-options: ["1815 / 1815","1828 / 1828","1830 / 1830","1849 / 1849"],
-correctAnswer: "1815 / 1815",
-explanation: "Atmiya Sabha was founded in 1815. / 1815 ஆம் ஆண்டு ஆத்மிய சபை நிறுவப்பட்டது."
-},
-
-{
-question: "Brahmo Samaj was founded in which year? / பிரஹ்மோ சமாஜ் எந்த ஆண்டு நிறுவப்பட்டது?",
-options: ["1815 / 1815","1828 / 1828","1829 / 1829","1833 / 1833"],
-correctAnswer: "1828 / 1828",
-explanation: "Brahmo Samaj was established in 1828. / 1828 ஆம் ஆண்டு பிரஹ்மோ சமாஜ் நிறுவப்பட்டது."
-},
-
-{
-question: "Brahmo Samaj rejected which practice? / பிரஹ்மோ சமாஜ் எந்த பழக்கத்தை நிராகரித்தது?",
-options: ["Monotheism / ஒரே கடவுள் நம்பிக்கை","Idol worship / சிலை வழிபாடு","Education / கல்வி","Reform / சீர்திருத்தம்"],
-correctAnswer: "Idol worship / சிலை வழிபாடு",
-explanation: "Brahmo Samaj rejected idol worship. / பிரஹ்மோ சமாஜ் சிலை வழிபாட்டை நிராகரித்தது."
-},
-
-{
-question: "Brahmo Samaj opposed which social system? / பிரஹ்மோ சமாஜ் எந்த சமூக அமைப்புக்கு எதிராக இருந்தது?",
-options: ["Democracy / ஜனநாயகம்","Caste rigidity / சாதி கடுமை","Education / கல்வி","Trade / வர்த்தகம்"],
-correctAnswer: "Caste rigidity / சாதி கடுமை",
-explanation: "It opposed caste rigidity as it divided society. / சமூகத்தைப் பிரிப்பதால் சாதி கடுமைக்கு எதிராக இருந்தது."
-},
-
-{
-question: "The main aim of Brahmo Samaj was to? / பிரஹ்மோ சமாஜின் முக்கிய நோக்கம் என்ன?",
-options: ["Spread Western culture / மேற்கு கலாச்சாரத்தைப் பரப்புதல்","Convert people / மதமாற்றம் செய்தல்","Reform Hinduism for modern society / நவீன சமூகத்திற்கு இந்துமதத்தை சீர்திருத்துதல்","Support British rule / பிரிட்டிஷ் ஆட்சியை ஆதரித்தல்"],
-correctAnswer: "Reform Hinduism for modern society / நவீன சமூகத்திற்கு இந்துமதத்தை சீர்திருத்துதல்",
-explanation: "It aimed to reshape Hinduism according to modern needs. / நவீன தேவைகளுக்கு ஏற்ப இந்துமதத்தை மாற்றுவதே அதன் நோக்கம்."
+question:"Sattriya classical dance belongs to which state?",
+options:["Assam","Kerala","Tamil Nadu","Odisha"],
+correctAnswer:"Assam",
+explanation:"Sattriya belongs to Assam."
 }
 ],
 
-"Page 2": [
+"Page 3":[
 {
-question: "Sattriya classical dance belongs to which state?",
-options: ["Assam","Kerala","Tamil Nadu","Odisha"],
-correctAnswer: "Assam",
-explanation: "Sattriya belongs to Assam."
+question:"Mohiniyattam belongs to which state?",
+options:["Kerala","Odisha","Assam","Tamil Nadu"],
+correctAnswer:"Kerala",
+explanation:"Mohiniyattam belongs to Kerala."
 }
 ],
 
-"Page 3": [
+"Page 4":[
 {
-question: "Mohiniyattam belongs to which state?",
-options: ["Kerala","Odisha","Assam","Tamil Nadu"],
-correctAnswer: "Kerala",
-explanation: "Mohiniyattam belongs to Kerala."
+question:"Bharatanatyam originated in?",
+options:["Tamil Nadu","Kerala","UP","Manipur"],
+correctAnswer:"Tamil Nadu",
+explanation:"Bharatanatyam originated in Tamil Nadu."
 }
 ],
 
-"Page 4": [
+"Page 5":[
 {
-question: "Bharatanatyam originated in?",
-options: ["Tamil Nadu","Kerala","UP","Manipur"],
-correctAnswer: "Tamil Nadu",
-explanation: "Bharatanatyam originated in Tamil Nadu."
+question:"Kathak belongs to which state?",
+options:["Uttar Pradesh","Kerala","Assam","Odisha"],
+correctAnswer:"Uttar Pradesh",
+explanation:"Kathak belongs to Uttar Pradesh."
 }
 ],
 
-"Page 5": [
-{
-question: "Kathak belongs to which state?",
-options: ["Uttar Pradesh","Kerala","Assam","Odisha"],
-correctAnswer: "Uttar Pradesh",
-explanation: "Kathak belongs to Uttar Pradesh."
-}
-],
+"Page 6":[
 
-"Page 6": [
 {
-question: "Kathak belongs to which state?",
-options: ["Uttar Pradesh","Kerala","Assam","Odisha"],
-correctAnswer: "Uttar Pradesh",
-explanation: "Kathak belongs to Uttar Pradesh."
+question:"Kathak belongs to which state?",
+options:["Uttar Pradesh","Kerala","Assam","Odisha"],
+correctAnswer:"Uttar Pradesh",
+explanation:"Kathak belongs to Uttar Pradesh."
 },
+
 {
-question: "raja belongs to which state?",
-options: ["Uttar Pradesh","Kerala","Assam","Odisha"],
-correctAnswer: "Uttar Pradesh",
-explanation: "Kathak belongs to Uttar Pradesh."
+question:"Raja belongs to which state?",
+options:["Uttar Pradesh","Kerala","Assam","Odisha"],
+correctAnswer:"Uttar Pradesh",
+explanation:"Example question."
 }
+
 ]
 
 };
 
 // =============================
 
-let quizData = [];
-let current = 0;
-let answers = [];
-let visited = [];
-let currentPage = "";
-let shuffleMode = false;
-
-// =============================
+let quizData=[]
+let current=0
+let answers=[]
+let visited=[]
+let currentPage=""
+let shuffleMode=false
+let submitted=false
 
 function shuffleArray(array){
-for(let i = array.length - 1; i > 0; i--){
-let j = Math.floor(Math.random() * (i + 1));
-[array[i], array[j]] = [array[j], array[i]];
+for(let i=array.length-1;i>0;i--){
+let j=Math.floor(Math.random()*(i+1))
+[array[i],array[j]]=[array[j],array[i]]
 }
-return array;
+return array
 }
-
-// =============================
 
 function loadPage(pageName){
 
-currentPage = pageName;
-
-quizData = JSON.parse(JSON.stringify(allPages[pageName]));
+submitted=false
+currentPage=pageName
+quizData=JSON.parse(JSON.stringify(allPages[pageName]))
 
 if(shuffleMode){
-shuffleArray(quizData);
-quizData.forEach(q => shuffleArray(q.options));
+shuffleArray(quizData)
+quizData.forEach(q=>shuffleArray(q.options))
 }
 
-current = 0;
-answers = new Array(quizData.length).fill(null);
-visited = new Array(quizData.length).fill(false);
+current=0
+answers=new Array(quizData.length).fill(null)
+visited=new Array(quizData.length).fill(false)
 
-document.getElementById("result").innerHTML = "";
+document.getElementById("result").innerHTML=""
 
-loadQuestion();
+loadQuestion()
 }
-
-// =============================
 
 function restartPage(){
-loadPage(currentPage);
+loadPage(currentPage)
 }
-
-// =============================
 
 function loadQuestion(){
 
-visited[current] = true;
+visited[current]=true
+let q=quizData[current]
 
-let q = quizData[current];
+document.getElementById("progress").innerText=
+"Question "+(current+1)+" of "+quizData.length
 
-document.getElementById("progress").innerText =
-"Question " + (current+1) + " of " + quizData.length;
+document.getElementById("question").innerHTML=
+"<b>Q"+(current+1)+":</b> "+q.question
 
-document.getElementById("question").innerText = q.question;
-
-let html = "";
+let html=""
 
 for(let i=0;i<q.options.length;i++){
 
-let className = "option";
+let className="option"
 
-if(answers[current] !== null){
-if(q.options[i] === q.correctAnswer)
-className += " correct";
-else if(i === answers[current])
-className += " wrong";
+if(answers[current]!==null){
+
+if(q.options[i]===q.correctAnswer)
+className+=" correct"
+
+else if(i===answers[current])
+className+=" wrong"
+
 }
 
-html += '<div class="'+className+'" onclick="selectAnswer('+i+')">'+q.options[i]+'</div>';
+html+='<div class="'+className+'" onclick="selectAnswer('+i+')">'+q.options[i]+'</div>'
 }
 
-document.getElementById("options").innerHTML = html;
+document.getElementById("options").innerHTML=html
 
-if(answers[current] !== null){
-document.getElementById("explanation").innerHTML =
-"<b>Explanation:</b> " + q.explanation;
+if(answers[current]!==null){
+document.getElementById("explanation").innerHTML=
+"<b>Explanation:</b> "+q.explanation
 }else{
-document.getElementById("explanation").innerHTML = "";
+document.getElementById("explanation").innerHTML=""
 }
 
-loadNavigation();
-updateSummary();
+loadNavigation()
+updateSummary()
 }
-
-// =============================
 
 function selectAnswer(index){
-answers[current] = index;
-loadQuestion();
+
+if(submitted) return
+
+answers[current]=index
+loadQuestion()
+
 }
 
 function nextQuestion(){
-if(current < quizData.length-1){
-current++;
-loadQuestion();
+if(current<quizData.length-1){
+current++
+loadQuestion()
 }
 }
 
 function prevQuestion(){
-if(current > 0){
-current--;
-loadQuestion();
+if(current>0){
+current--
+loadQuestion()
 }
 }
 
 function goToQuestion(i){
-current = i;
-loadQuestion();
+current=i
+loadQuestion()
 }
-
-// =============================
 
 function loadNavigation(){
 
-let navHTML = "";
+let navHTML=""
 
 for(let i=0;i<quizData.length;i++){
 
-let className = "nav-btn";
+let className="nav-btn"
 
-if(i === current) className += " current";
-else if(answers[i] !== null) className += " answered";
-else if(visited[i]) className += " notanswered";
+if(i===current) className+=" current"
 
-navHTML += '<button class="'+className+'" onclick="goToQuestion('+i+')">'+(i+1)+'</button>';
+else if(submitted && answers[i]!==null){
+
+if(quizData[i].options[answers[i]]===quizData[i].correctAnswer)
+className+=" correct"
+else
+className+=" wrong"
+
 }
 
-document.getElementById("navPanel").innerHTML = navHTML;
+else if(answers[i]!==null) className+=" answered"
+
+else if(visited[i]) className+=" notanswered"
+
+navHTML+='<button class="'+className+'" onclick="goToQuestion('+i+')">'+(i+1)+'</button>'
+
 }
 
-// =============================
+document.getElementById("navPanel").innerHTML=navHTML
+}
 
 function updateSummary(){
 
-let answered = answers.filter(a=>a!==null).length;
-let notVisited = visited.filter(v=>v===false).length;
-let notAnswered = quizData.length - answered - notVisited;
+let answered=answers.filter(a=>a!==null).length
+let notVisited=visited.filter(v=>v===false).length
+let notAnswered=quizData.length-answered-notVisited
 
-document.getElementById("answeredCount").innerText = answered;
-document.getElementById("notAnsweredCount").innerText = notAnswered;
-document.getElementById("notVisitedCount").innerText = notVisited;
+document.getElementById("answeredCount").innerText=answered
+document.getElementById("notAnsweredCount").innerText=notAnswered
+document.getElementById("notVisitedCount").innerText=notVisited
 }
-
-// =============================
 
 function showResult(){
 
-let score = 0;
+submitted=true
+
+let score=0
 
 for(let i=0;i<quizData.length;i++){
-if(quizData[i].options[answers[i]] === quizData[i].correctAnswer){
-score++;
-}
-}
 
-document.getElementById("result").innerHTML =
-"<h3>Your Score: "+score+" / "+quizData.length+"</h3>";
+if(quizData[i].options[answers[i]]===quizData[i].correctAnswer){
+score++
 }
 
-// =============================
+}
 
-window.onload = function(){
+document.getElementById("result").innerHTML=
+"<h3>Your Score: "+score+" / "+quizData.length+"</h3>"
 
-let pageSelect = document.getElementById("pageSelect");
+loadNavigation()
+
+}
+
+window.onload=function(){
+
+let pageSelect=document.getElementById("pageSelect")
 
 for(let page in allPages){
-let option = document.createElement("option");
-option.value = page;
-option.text = page;
-pageSelect.appendChild(option);
+let option=document.createElement("option")
+option.value=page
+option.text=page
+pageSelect.appendChild(option)
 }
 
-pageSelect.onchange = function(){
-loadPage(this.value);
-};
+pageSelect.onchange=function(){
+loadPage(this.value)
+}
 
-document.getElementById("modeSelect").onchange = function(){
-shuffleMode = (this.value === "true");
-loadPage(pageSelect.value);
-};
+document.getElementById("modeSelect").onchange=function(){
+shuffleMode=(this.value==="true")
+loadPage(pageSelect.value)
+}
 
-loadPage(Object.keys(allPages)[0]);
-};
+loadPage(Object.keys(allPages)[0])
+
+}
 
 </script>
 
