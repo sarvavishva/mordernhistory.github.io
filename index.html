@@ -2,7 +2,7 @@
 
 <html>
 <head>
-<title>Professional Quiz System</title>
+<title>Professional Quiz</title>
 
 <style>
 
@@ -129,10 +129,9 @@ color:#d9534f;
 
 <script>
 
-const allPages={
+const allPages = {
 
 "Page 1":[
-
 {
 question:"Who is known as the Father of the Indian Renaissance?",
 options:["Swami Vivekananda","Raja Ram Mohan Roy","Dayananda Saraswati","Ishwar Chandra Vidyasagar"],
@@ -151,9 +150,8 @@ explanation:"He was born in 1772."
 question:"Raja Ram Mohan Roy opposed which practice?",
 options:["Child marriage","Sati","Untouchability","Polygamy"],
 correctAnswer:"Sati",
-explanation:"He fought against Sati practice."
+explanation:"He fought against the Sati system."
 }
-
 ],
 
 "Page 2":[
@@ -176,10 +174,9 @@ let shuffleMode=false
 let currentPage=""
 let submitted=false
 
-// TIMER
 let time=300
 
-setInterval(function(){
+let timerInterval=setInterval(function(){
 
 let min=Math.floor(time/60)
 let sec=time%60
@@ -188,13 +185,13 @@ document.getElementById("timer").innerText="Time Left: "+min+":"+sec
 
 time--
 
-if(time<=0){
+if(time<0){
 showResult()
 }
 
 },1000)
 
-// SHUFFLE
+// shuffle
 function shuffleArray(arr){
 for(let i=arr.length-1;i>0;i--){
 let j=Math.floor(Math.random()*(i+1))
@@ -202,7 +199,7 @@ let j=Math.floor(Math.random()*(i+1))
 }
 }
 
-// LOAD PAGE
+// load page
 function loadPage(page){
 
 submitted=false
@@ -225,7 +222,7 @@ loadQuestion()
 
 }
 
-// LOAD QUESTION
+// load question
 function loadQuestion(){
 
 visited[current]=true
@@ -233,4 +230,184 @@ visited[current]=true
 let q=quizData[current]
 
 document.getElementById("progress").innerText=
-"Question "+(current+1)+" of "+quizData.lengt
+"Question "+(current+1)+" of "+quizData.length
+
+document.getElementById("question").innerHTML=
+"<b>Q"+(current+1)+":</b> "+q.question
+
+let html=""
+
+q.options.forEach((opt,i)=>{
+
+let cls="option"
+
+if(answers[current]!==null){
+
+if(opt===q.correctAnswer) cls+=" correct"
+else if(i===answers[current]) cls+=" wrong"
+
+}
+
+html+=`<div class="${cls}" onclick="selectAnswer(${i})">${opt}</div>`
+
+})
+
+document.getElementById("options").innerHTML=html
+
+loadNavigation()
+updateSummary()
+
+}
+
+// select answer
+function selectAnswer(i){
+
+if(submitted) return
+
+answers[current]=i
+
+loadQuestion()
+
+}
+
+// mark review
+function markReview(){
+
+review[current]=!review[current]
+
+loadNavigation()
+
+}
+
+// navigation
+function loadNavigation(){
+
+let html=""
+
+for(let i=0;i<quizData.length;i++){
+
+let cls="nav-btn"
+
+if(i===current) cls+=" current"
+
+else if(review[i]) cls+=" review"
+
+else if(submitted && answers[i]!==null){
+
+if(quizData[i].options[answers[i]]===quizData[i].correctAnswer)
+cls+=" correct"
+else
+cls+=" wrong"
+
+}
+
+else if(visited[i] && answers[i]===null)
+cls+=" notanswered"
+
+html+=`<button class="${cls}" onclick="goToQuestion(${i})">${i+1}</button>`
+
+}
+
+document.getElementById("navPanel").innerHTML=html
+
+}
+
+// go to
+function goToQuestion(i){
+current=i
+loadQuestion()
+}
+
+// next
+function nextQuestion(){
+if(current<quizData.length-1){
+current++
+loadQuestion()
+}
+}
+
+// prev
+function prevQuestion(){
+if(current>0){
+current--
+loadQuestion()
+}
+}
+
+// summary
+function updateSummary(){
+
+let answered=answers.filter(a=>a!==null).length
+let notVisited=visited.filter(v=>!v).length
+
+document.getElementById("summary").innerHTML=
+"Answered: "+answered+"<br>Not Visited: "+notVisited
+
+}
+
+// result
+function showResult(){
+
+submitted=true
+
+let score=0
+
+for(let i=0;i<quizData.length;i++){
+
+if(quizData[i].options[answers[i]]===quizData[i].correctAnswer)
+score++
+
+}
+
+let percent=((score/quizData.length)*100).toFixed(2)
+
+document.getElementById("result").innerHTML=
+"<h3>Score: "+score+"/"+quizData.length+"</h3>"+
+"<h3>Percentage: "+percent+"%</h3>"
+
+loadNavigation()
+
+}
+
+// restart
+function restartPage(){
+
+time=300
+
+loadPage(currentPage)
+
+}
+
+// init
+window.onload=function(){
+
+let pageSelect=document.getElementById("pageSelect")
+
+for(let page in allPages){
+
+let opt=document.createElement("option")
+
+opt.value=page
+opt.text=page
+
+pageSelect.appendChild(opt)
+
+}
+
+pageSelect.onchange=function(){
+loadPage(this.value)
+}
+
+document.getElementById("modeSelect").onchange=function(){
+shuffleMode=(this.value==="true")
+loadPage(pageSelect.value)
+}
+
+loadPage(Object.keys(allPages)[0])
+
+}
+
+</script>
+
+</body>
+</html>
