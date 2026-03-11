@@ -48,7 +48,6 @@ border:none;
 }
 
 .nav-area{
-flex:1;
 background:#222;
 color:white;
 padding:15px;
@@ -56,8 +55,8 @@ position:fixed;
 right:0;
 top:0;
 height:100%;
-overflow-y:auto;
 width:260px;
+overflow-y:auto;
 }
 
 .summary{
@@ -98,7 +97,7 @@ margin:5px 0;
 
 <div class="question-area">
 
-<h2>CLASSICAL DANCE MCQ Quiz</h2>
+<h2>MCQ Quiz</h2>
 
 <label><b>Select Page:</b></label><br>
 <select id="pageSelect"></select>
@@ -142,10 +141,10 @@ Not Visited: <span id="notVisitedCount">0</span>
 <script>
 
 // =============================
-// ALL QUIZ PAGES
+// QUESTIONS
 // =============================
 
-const allPages = {
+const allPages={
 
 "Page 1":[
 
@@ -164,59 +163,10 @@ explanation:"He was born in 1772."
 },
 
 {
-question:"Raja Ram Mohan Roy was born in which village?",
-options:["Nadia","Radhanagar","Murshidabad","Patna"],
-correctAnswer:"Radhanagar",
-explanation:"His birthplace was Radhanagar village."
-},
-
-{
-question:"Radhanagar is located in which region?",
-options:["Punjab","Bengal","Maharashtra","Bihar"],
-correctAnswer:"Bengal",
-explanation:"He was born in Bengal."
-},
-
-{
-question:"Raja Ram Mohan Roy studied Sanskrit literature in which city?",
-options:["Kolkata","Patna","Varanasi","Delhi"],
-correctAnswer:"Varanasi",
-explanation:"He studied Sanskrit and Hindu philosophy in Varanasi."
-},
-
-{
-question:"He studied Persian and Arabic in which city?",
-options:["Varanasi","Patna","Calcutta","Agra"],
-correctAnswer:"Patna",
-explanation:"He studied Persian and Arabic in Patna."
-},
-
-{
-question:"Raja Ram Mohan Roy opposed which inhuman practice?",
+question:"Raja Ram Mohan Roy opposed which practice?",
 options:["Child marriage","Sati","Untouchability","Polygamy"],
 correctAnswer:"Sati",
-explanation:"He led a powerful movement against sati."
-},
-
-{
-question:"Which Governor-General helped abolish Sati in 1829?",
-options:["Lord Dalhousie","Lord Canning","William Bentinck","Lord Curzon"],
-correctAnswer:"William Bentinck",
-explanation:"William Bentinck passed the regulation banning sati."
-},
-
-{
-question:"In which year was Sati officially abolished?",
-options:["1815","1828","1829","1835"],
-correctAnswer:"1829",
-explanation:"The law abolishing sati was enacted in 1829."
-},
-
-{
-question:"Raja Ram Mohan Roy supported which type of education?",
-options:["Traditional only","Western modern education","Military education","Religious-only education"],
-correctAnswer:"Western modern education",
-explanation:"He supported modern western education."
+explanation:"He led a movement against sati."
 }
 
 ],
@@ -237,42 +187,6 @@ options:["Kerala","Odisha","Assam","Tamil Nadu"],
 correctAnswer:"Kerala",
 explanation:"Mohiniyattam belongs to Kerala."
 }
-],
-
-"Page 4":[
-{
-question:"Bharatanatyam originated in?",
-options:["Tamil Nadu","Kerala","UP","Manipur"],
-correctAnswer:"Tamil Nadu",
-explanation:"Bharatanatyam originated in Tamil Nadu."
-}
-],
-
-"Page 5":[
-{
-question:"Kathak belongs to which state?",
-options:["Uttar Pradesh","Kerala","Assam","Odisha"],
-correctAnswer:"Uttar Pradesh",
-explanation:"Kathak belongs to Uttar Pradesh."
-}
-],
-
-"Page 6":[
-
-{
-question:"Kathak belongs to which state?",
-options:["Uttar Pradesh","Kerala","Assam","Odisha"],
-correctAnswer:"Uttar Pradesh",
-explanation:"Kathak belongs to Uttar Pradesh."
-},
-
-{
-question:"Raja belongs to which state?",
-options:["Uttar Pradesh","Kerala","Assam","Odisha"],
-correctAnswer:"Uttar Pradesh",
-explanation:"Example question."
-}
-
 ]
 
 };
@@ -287,48 +201,73 @@ let currentPage=""
 let shuffleMode=false
 let submitted=false
 
+// =============================
+// SHUFFLE FUNCTION
+// =============================
+
 function shuffleArray(array){
+
 for(let i=array.length-1;i>0;i--){
+
 let j=Math.floor(Math.random()*(i+1))
+
 [array[i],array[j]]=[array[j],array[i]]
-}
-return array
+
 }
 
-function loadPage(pageName){
+}
+
+// =============================
+
+function loadPage(page){
 
 submitted=false
-currentPage=pageName
-quizData=JSON.parse(JSON.stringify(allPages[pageName]))
+
+currentPage=page
+
+quizData=JSON.parse(JSON.stringify(allPages[page]))
 
 if(shuffleMode){
+
 shuffleArray(quizData)
-quizData.forEach(q=>shuffleArray(q.options))
+
+quizData.forEach(q=>{
+shuffleArray(q.options)
+})
+
 }
 
 current=0
+
 answers=new Array(quizData.length).fill(null)
+
 visited=new Array(quizData.length).fill(false)
 
 document.getElementById("result").innerHTML=""
 
 loadQuestion()
+
 }
 
+// =============================
+
 function restartPage(){
+
 loadPage(currentPage)
+
 }
+
+// =============================
 
 function loadQuestion(){
 
 visited[current]=true
+
 let q=quizData[current]
 
-document.getElementById("progress").innerText=
-"Question "+(current+1)+" of "+quizData.length
+document.getElementById("progress").innerText="Question "+(current+1)+" of "+quizData.length
 
-document.getElementById("question").innerHTML=
-"<b>Q"+(current+1)+":</b> "+q.question
+document.getElementById("question").innerHTML="<b>Q"+(current+1)+":</b> "+q.question
 
 let html=""
 
@@ -346,49 +285,75 @@ className+=" wrong"
 
 }
 
-html+='<div class="'+className+'" onclick="selectAnswer('+i+')">'+q.options[i]+'</div>'
+html+=`<div class="${className}" onclick="selectAnswer(${i})">${q.options[i]}</div>`
+
 }
 
 document.getElementById("options").innerHTML=html
 
 if(answers[current]!==null){
-document.getElementById("explanation").innerHTML=
-"<b>Explanation:</b> "+q.explanation
-}else{
+document.getElementById("explanation").innerHTML="<b>Explanation:</b> "+q.explanation
+}
+else{
 document.getElementById("explanation").innerHTML=""
 }
 
 loadNavigation()
 updateSummary()
+
 }
+
+// =============================
 
 function selectAnswer(index){
 
 if(submitted) return
 
 answers[current]=index
+
 loadQuestion()
 
 }
+
+// =============================
 
 function nextQuestion(){
+
 if(current<quizData.length-1){
+
 current++
+
 loadQuestion()
+
 }
+
 }
+
+// =============================
 
 function prevQuestion(){
+
 if(current>0){
+
 current--
+
 loadQuestion()
-}
+
 }
 
-function goToQuestion(i){
-current=i
-loadQuestion()
 }
+
+// =============================
+
+function goToQuestion(i){
+
+current=i
+
+loadQuestion()
+
+}
+
+// =============================
 
 function loadNavigation(){
 
@@ -398,38 +363,50 @@ for(let i=0;i<quizData.length;i++){
 
 let className="nav-btn"
 
-if(i===current) className+=" current"
+if(i===current)
+className+=" current"
 
 else if(submitted && answers[i]!==null){
 
 if(quizData[i].options[answers[i]]===quizData[i].correctAnswer)
 className+=" correct"
+
 else
 className+=" wrong"
 
 }
 
-else if(answers[i]!==null) className+=" answered"
+else if(answers[i]!==null)
+className+=" correct"
 
-else if(visited[i]) className+=" notanswered"
+else if(visited[i])
+className+=" notanswered"
 
-navHTML+='<button class="'+className+'" onclick="goToQuestion('+i+')">'+(i+1)+'</button>'
+navHTML+=`<button class="${className}" onclick="goToQuestion(${i})">${i+1}</button>`
 
 }
 
 document.getElementById("navPanel").innerHTML=navHTML
+
 }
+
+// =============================
 
 function updateSummary(){
 
 let answered=answers.filter(a=>a!==null).length
+
 let notVisited=visited.filter(v=>v===false).length
+
 let notAnswered=quizData.length-answered-notVisited
 
 document.getElementById("answeredCount").innerText=answered
 document.getElementById("notAnsweredCount").innerText=notAnswered
 document.getElementById("notVisitedCount").innerText=notVisited
+
 }
+
+// =============================
 
 function showResult(){
 
@@ -440,7 +417,9 @@ let score=0
 for(let i=0;i<quizData.length;i++){
 
 if(quizData[i].options[answers[i]]===quizData[i].correctAnswer){
+
 score++
+
 }
 
 }
@@ -452,24 +431,36 @@ loadNavigation()
 
 }
 
+// =============================
+
 window.onload=function(){
 
 let pageSelect=document.getElementById("pageSelect")
 
 for(let page in allPages){
+
 let option=document.createElement("option")
+
 option.value=page
+
 option.text=page
+
 pageSelect.appendChild(option)
+
 }
 
 pageSelect.onchange=function(){
+
 loadPage(this.value)
+
 }
 
 document.getElementById("modeSelect").onchange=function(){
+
 shuffleMode=(this.value==="true")
+
 loadPage(pageSelect.value)
+
 }
 
 loadPage(Object.keys(allPages)[0])
