@@ -1,7 +1,8 @@
 <!DOCTYPE html>
+
 <html>
 <head>
-<title>Professional Multi-Page Quiz</title>
+<title>Professional Quiz System</title>
 
 <style>
 
@@ -19,49 +20,33 @@ height:100vh;
 .question-area{
 flex:3;
 padding:20px;
-overflow-y:auto;
 background:white;
 margin-right:260px;
+overflow-y:auto;
+}
+
+.nav-area{
+position:fixed;
+right:0;
+top:0;
+width:260px;
+height:100%;
+background:#222;
+color:white;
+padding:15px;
+overflow-y:auto;
 }
 
 .option{
-margin:8px 0;
 padding:10px;
 border:1px solid #ccc;
+margin:8px 0;
 border-radius:5px;
 cursor:pointer;
 }
 
 .option.correct{background:#c8f7c5;}
 .option.wrong{background:#f7c5c5;}
-
-button{
-margin:5px;
-padding:8px 15px;
-cursor:pointer;
-}
-
-.restart-btn{
-background:#ff9800;
-color:white;
-border:none;
-}
-
-.nav-area{
-background:#222;
-color:white;
-padding:15px;
-position:fixed;
-right:0;
-top:0;
-height:100%;
-width:260px;
-overflow-y:auto;
-}
-
-.summary{
-margin-bottom:15px;
-}
 
 .nav-grid{
 display:flex;
@@ -73,22 +58,32 @@ gap:5px;
 width:35px;
 height:35px;
 border:none;
-cursor:pointer;
 background:#555;
 color:white;
+cursor:pointer;
 }
 
 .nav-btn.current{background:#1e90ff;}
 .nav-btn.correct{background:#28a745;}
 .nav-btn.wrong{background:#dc3545;}
+.nav-btn.review{background:#ffc107;}
 .nav-btn.notanswered{background:#ff9800;}
 
-select{
-padding:6px;
-margin:5px 0;
+button{
+margin:5px;
+padding:8px 14px;
+cursor:pointer;
+}
+
+.timer{
+font-size:18px;
+font-weight:bold;
+margin-bottom:10px;
+color:#d9534f;
 }
 
 </style>
+
 </head>
 
 <body>
@@ -99,11 +94,12 @@ margin:5px 0;
 
 <h2>MCQ Quiz</h2>
 
-<label><b>Select Page:</b></label><br>
-<select id="pageSelect"></select>
+<div class="timer" id="timer"></div>
 
-<label><b>Select Mode:</b></label><br>
-<select id="modeSelect">
+<label>Select Page</label><br> <select id="pageSelect"></select>
+
+<label>Select Mode</label><br> <select id="modeSelect">
+
 <option value="false">Non Shuffle</option>
 <option value="true">Shuffle</option>
 </select>
@@ -112,10 +108,7 @@ margin:5px 0;
 <div id="question"></div>
 <div id="options"></div>
 
-<button onclick="prevQuestion()">Previous</button>
-<button onclick="nextQuestion()">Next</button>
-<button onclick="showResult()">Submit</button>
-<button class="restart-btn" onclick="restartPage()">Restart Page</button>
+<button onclick="prevQuestion()">Previous</button> <button onclick="nextQuestion()">Next</button> <button onclick="markReview()">Mark Review</button> <button onclick="showResult()">Submit</button> <button onclick="restartPage()">Restart</button>
 
 <div id="explanation"></div>
 <div id="result"></div>
@@ -126,11 +119,7 @@ margin:5px 0;
 
 <h3>Question Palette</h3>
 
-<div class="summary">
-Answered: <span id="answeredCount">0</span><br>
-Not Answered: <span id="notAnsweredCount">0</span><br>
-Not Visited: <span id="notVisitedCount">0</span>
-</div>
+<div id="summary"></div>
 
 <div class="nav-grid" id="navPanel"></div>
 
@@ -140,10 +129,6 @@ Not Visited: <span id="notVisitedCount">0</span>
 
 <script>
 
-// =============================
-// QUESTIONS
-// =============================
-
 const allPages={
 
 "Page 1":[
@@ -152,7 +137,7 @@ const allPages={
 question:"Who is known as the Father of the Indian Renaissance?",
 options:["Swami Vivekananda","Raja Ram Mohan Roy","Dayananda Saraswati","Ishwar Chandra Vidyasagar"],
 correctAnswer:"Raja Ram Mohan Roy",
-explanation:"Raja Ram Mohan Roy is called the Father of the Indian Renaissance."
+explanation:"Raja Ram Mohan Roy led major social reforms."
 },
 
 {
@@ -166,308 +151,86 @@ explanation:"He was born in 1772."
 question:"Raja Ram Mohan Roy opposed which practice?",
 options:["Child marriage","Sati","Untouchability","Polygamy"],
 correctAnswer:"Sati",
-explanation:"He led a movement against sati."
+explanation:"He fought against Sati practice."
 }
 
 ],
 
 "Page 2":[
 {
-question:"Sattriya classical dance belongs to which state?",
-options:["Assam","Kerala","Tamil Nadu","Odisha"],
-correctAnswer:"Assam",
-explanation:"Sattriya belongs to Assam."
-}
-],
-
-"Page 3":[
-{
-question:"Mohiniyattam belongs to which state?",
-options:["Kerala","Odisha","Assam","Tamil Nadu"],
-correctAnswer:"Kerala",
-explanation:"Mohiniyattam belongs to Kerala."
+question:"Bharatanatyam originated in which state?",
+options:["Tamil Nadu","Kerala","UP","Manipur"],
+correctAnswer:"Tamil Nadu",
+explanation:"Bharatanatyam originated in Tamil Nadu."
 }
 ]
 
-};
-
-// =============================
+}
 
 let quizData=[]
-let current=0
 let answers=[]
 let visited=[]
-let currentPage=""
+let review=[]
+let current=0
 let shuffleMode=false
+let currentPage=""
 let submitted=false
 
-// =============================
-// SHUFFLE FUNCTION
-// =============================
+// TIMER
+let time=300
 
-function shuffleArray(array){
+setInterval(function(){
 
-for(let i=array.length-1;i>0;i--){
+let min=Math.floor(time/60)
+let sec=time%60
 
+document.getElementById("timer").innerText="Time Left: "+min+":"+sec
+
+time--
+
+if(time<=0){
+showResult()
+}
+
+},1000)
+
+// SHUFFLE
+function shuffleArray(arr){
+for(let i=arr.length-1;i>0;i--){
 let j=Math.floor(Math.random()*(i+1))
-
-[array[i],array[j]]=[array[j],array[i]]
-
+[arr[i],arr[j]]=[arr[j],arr[i]]
+}
 }
 
-}
-
-// =============================
-
+// LOAD PAGE
 function loadPage(page){
 
 submitted=false
-
 currentPage=page
 
 quizData=JSON.parse(JSON.stringify(allPages[page]))
 
 if(shuffleMode){
-
 shuffleArray(quizData)
-
-quizData.forEach(q=>{
-shuffleArray(q.options)
-})
-
+quizData.forEach(q=>shuffleArray(q.options))
 }
 
-current=0
-
 answers=new Array(quizData.length).fill(null)
-
 visited=new Array(quizData.length).fill(false)
+review=new Array(quizData.length).fill(false)
 
-document.getElementById("result").innerHTML=""
+current=0
 
 loadQuestion()
 
 }
 
-// =============================
-
-function restartPage(){
-
-loadPage(currentPage)
-
-}
-
-// =============================
-
+// LOAD QUESTION
 function loadQuestion(){
 
 visited[current]=true
 
 let q=quizData[current]
 
-document.getElementById("progress").innerText="Question "+(current+1)+" of "+quizData.length
-
-document.getElementById("question").innerHTML="<b>Q"+(current+1)+":</b> "+q.question
-
-let html=""
-
-for(let i=0;i<q.options.length;i++){
-
-let className="option"
-
-if(answers[current]!==null){
-
-if(q.options[i]===q.correctAnswer)
-className+=" correct"
-
-else if(i===answers[current])
-className+=" wrong"
-
-}
-
-html+=`<div class="${className}" onclick="selectAnswer(${i})">${q.options[i]}</div>`
-
-}
-
-document.getElementById("options").innerHTML=html
-
-if(answers[current]!==null){
-document.getElementById("explanation").innerHTML="<b>Explanation:</b> "+q.explanation
-}
-else{
-document.getElementById("explanation").innerHTML=""
-}
-
-loadNavigation()
-updateSummary()
-
-}
-
-// =============================
-
-function selectAnswer(index){
-
-if(submitted) return
-
-answers[current]=index
-
-loadQuestion()
-
-}
-
-// =============================
-
-function nextQuestion(){
-
-if(current<quizData.length-1){
-
-current++
-
-loadQuestion()
-
-}
-
-}
-
-// =============================
-
-function prevQuestion(){
-
-if(current>0){
-
-current--
-
-loadQuestion()
-
-}
-
-}
-
-// =============================
-
-function goToQuestion(i){
-
-current=i
-
-loadQuestion()
-
-}
-
-// =============================
-
-function loadNavigation(){
-
-let navHTML=""
-
-for(let i=0;i<quizData.length;i++){
-
-let className="nav-btn"
-
-if(i===current)
-className+=" current"
-
-else if(submitted && answers[i]!==null){
-
-if(quizData[i].options[answers[i]]===quizData[i].correctAnswer)
-className+=" correct"
-
-else
-className+=" wrong"
-
-}
-
-else if(answers[i]!==null)
-className+=" correct"
-
-else if(visited[i])
-className+=" notanswered"
-
-navHTML+=`<button class="${className}" onclick="goToQuestion(${i})">${i+1}</button>`
-
-}
-
-document.getElementById("navPanel").innerHTML=navHTML
-
-}
-
-// =============================
-
-function updateSummary(){
-
-let answered=answers.filter(a=>a!==null).length
-
-let notVisited=visited.filter(v=>v===false).length
-
-let notAnswered=quizData.length-answered-notVisited
-
-document.getElementById("answeredCount").innerText=answered
-document.getElementById("notAnsweredCount").innerText=notAnswered
-document.getElementById("notVisitedCount").innerText=notVisited
-
-}
-
-// =============================
-
-function showResult(){
-
-submitted=true
-
-let score=0
-
-for(let i=0;i<quizData.length;i++){
-
-if(quizData[i].options[answers[i]]===quizData[i].correctAnswer){
-
-score++
-
-}
-
-}
-
-document.getElementById("result").innerHTML=
-"<h3>Your Score: "+score+" / "+quizData.length+"</h3>"
-
-loadNavigation()
-
-}
-
-// =============================
-
-window.onload=function(){
-
-let pageSelect=document.getElementById("pageSelect")
-
-for(let page in allPages){
-
-let option=document.createElement("option")
-
-option.value=page
-
-option.text=page
-
-pageSelect.appendChild(option)
-
-}
-
-pageSelect.onchange=function(){
-
-loadPage(this.value)
-
-}
-
-document.getElementById("modeSelect").onchange=function(){
-
-shuffleMode=(this.value==="true")
-
-loadPage(pageSelect.value)
-
-}
-
-loadPage(Object.keys(allPages)[0])
-
-}
-
-</script>
-
-</body>
-</html>
+document.getElementById("progress").innerText=
+"Question "+(current+1)+" of "+quizData.lengt
